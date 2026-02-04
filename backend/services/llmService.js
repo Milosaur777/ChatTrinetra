@@ -44,23 +44,34 @@ async function chat({ system_prompt, message, file_context, message_history, mod
   try {
     const selectedModel = selectModel(model);
 
-    // Build context
-    let context = system_prompt ? `System Instructions: ${system_prompt}\n\n` : '';
+    // Build context - file context only, system prompt goes separately
+    let context = '';
     if (file_context) {
       context += `Document Context:\n${file_context}\n\n`;
     }
 
-    // Add message history
-    const messages = [
-      ...message_history.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      })),
-      {
-        role: 'user',
-        content: context + message
-      }
-    ];
+    // Add message history - only take user/assistant content, strip any tool calls
+    const messages = [];
+    
+    if (message_history && message_history.length > 0) {
+      message_history.forEach(msg => {
+        // Only include regular user/assistant messages
+        if (msg.role === 'user' || msg.role === 'assistant') {
+          // If content is string, use as-is; if object, stringify it
+          const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+          messages.push({
+            role: msg.role,
+            content: content
+          });
+        }
+      });
+    }
+
+    // Add current message
+    messages.push({
+      role: 'user',
+      content: context + message
+    });
 
     // Call OpenRouter
     if (selectedModel.includes('openrouter')) {
