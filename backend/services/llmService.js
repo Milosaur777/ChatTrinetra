@@ -1,0 +1,155 @@
+/**
+ * LLM Service
+ * Integration with OpenRouter, Ollama, and local models
+ */
+
+const axios = require('axios');
+
+// Model routing logic
+const modelConfig = {
+  'haiku': 'openrouter/anthropic/claude-haiku-4.5',
+  'kimi': 'openrouter/moonshotai/kimi-k2.5',
+  'gemini': 'openrouter/google/gemini-flash-1.5',
+  'opus': 'openrouter/anthropic/claude-opus-4',
+  'sonnet': 'openrouter/anthropic/claude-sonnet-4.5',
+  'deepseek': 'openrouter/deepseek/deepseek-r1-distill-qwen-32b',
+  'ollama': 'http://localhost:11434/api/chat'
+};
+
+/**
+ * Route request to appropriate model based on complexity
+ */
+function selectModel(userModel = null, complexity = 'simple') {
+  if (userModel) return userModel;
+
+  // Auto-routing based on complexity
+  switch (complexity) {
+    case 'simple':
+      return modelConfig.haiku;
+    case 'coding':
+      return modelConfig.kimi;
+    case 'frontend':
+      return modelConfig.gemini;
+    case 'hard':
+      return modelConfig.sonnet;
+    default:
+      return modelConfig.haiku;
+  }
+}
+
+/**
+ * Send message to LLM
+ */
+async function chat({ system_prompt, message, file_context, message_history, model }) {
+  try {
+    const selectedModel = selectModel(model);
+
+    // Build context
+    let context = system_prompt ? `System Instructions: ${system_prompt}\n\n` : '';
+    if (file_context) {
+      context += `Document Context:\n${file_context}\n\n`;
+    }
+
+    // Add message history
+    const messages = [
+      ...message_history.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
+      {
+        role: 'user',
+        content: context + message
+      }
+    ];
+
+    // Call OpenRouter
+    if (selectedModel.includes('openrouter')) {
+      return await callOpenRouter(selectedModel, messages, system_prompt);
+    }
+    // Call Ollama
+    else if (selectedModel === modelConfig.ollama) {
+      return await callOllama(messages);
+    }
+  } catch (error) {
+    console.error('LLM Service error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Call OpenRouter API
+ */
+async function callOpenRouter(model, messages, system_prompt) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENROUTER_API_KEY not configured');
+  }
+
+  try {
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: model.replace('openrouter/', ''),
+        messages: system_prompt ? [
+          { role: 'system', content: system_prompt },
+          ...messages
+        ] : messages,
+        temperature: 0.7,
+        max_tokens: 2000
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://captainclaw.ai',
+          'X-Title': 'CaptainClaw'
+        }
+      }
+    );
+
+    return {
+      content: response.data.choices[0].message.content,
+      model: model,
+      tokens: response.data.usage?.total_tokens || 0
+    };
+  } catch (error) {
+    console.error('OpenRouter API error:', error.response?.data || error.message);
+    throw new Error(`OpenRouter error: ${error.message}`);
+  }
+}
+
+/**
+ * Call Ollama (local LLM)
+ */
+async function callOllama(messages, system_prompt = '') {
+  try {
+    // Add system prompt to first message if provided
+    const messagesWithSystem = system_prompt 
+      ? [{ role: 'system', content: system_prompt }, ...messages]
+      : messages;
+
+    const response = await axios.post(
+      'http://localhost:11434/api/chat',
+      {
+        model: 'llama2',
+        messages: messagesWithSystem,
+        stream: false
+      }
+    );
+
+    return {
+      content: response.data.message.content,
+      model: 'ollama/llama2',
+      tokens: 0 // Ollama doesn't track tokens
+    };
+  } catch (error) {
+    console.error('Ollama error:', error.message);
+    throw new Error(`Ollama not running on localhost:11434. Install Ollama and run: ollama serve`);
+  }
+}
+
+module.exports = {
+  chat,
+  selectModel,
+  callOpenRouter,
+  callOllama
+};
