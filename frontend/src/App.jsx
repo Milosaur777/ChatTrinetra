@@ -3,9 +3,13 @@ import { motion } from 'framer-motion'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
 import HealthIndicator from './components/HealthIndicator'
+import CommandPalette from './components/CommandPalette'
+import { CommandPaletteProvider } from './contexts/CommandPaletteContext'
+import { useCommandPaletteShortcut } from './hooks/useCommandPaletteShortcut'
 import api from './services/api'
 
-function App() {
+// Inner app component that uses command palette hooks
+function AppContent() {
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -53,6 +57,9 @@ function App() {
     }
   }
 
+  // Setup keyboard shortcut listener
+  useCommandPaletteShortcut()
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -80,7 +87,19 @@ function App() {
         showNewProject={showNewProject}
         onCloseNewProject={() => setShowNewProject(false)}
       />
+
+      {/* Command Palette Modal */}
+      <CommandPalette projects={projects} files={selectedProject?.files || []} />
     </motion.div>
+  )
+}
+
+// Wrap App with CommandPaletteProvider
+function App() {
+  return (
+    <CommandPaletteProvider>
+      <AppContent />
+    </CommandPaletteProvider>
   )
 }
 
