@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
+import HeroIcon from './Icon'
 
 export default function ChatWindow({ conversation, files, onConversationUpdate }) {
   const [messages, setMessages] = useState([])
@@ -20,32 +21,32 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
   const models = [
     { 
       value: 'openrouter/anthropic/claude-haiku-4.5', 
-      label: '💰 Haiku (Fast & Free)',
+      label: 'Haiku (Fast & Free)',
       description: '$0.25/M tokens'
     },
     { 
       value: 'openrouter/moonshotai/kimi-k2.5', 
-      label: '🎯 Kimi K2.5 (Great for Code)',
+      label: 'Kimi K2.5 (Great for Code)',
       description: 'FREE this week!'
     },
     { 
       value: 'openrouter/google/gemini-flash-1.5', 
-      label: '⚡ Gemini Flash (Fast)',
+      label: 'Gemini Flash (Fast)',
       description: '$0.15/M tokens'
     },
     { 
       value: 'openrouter/anthropic/claude-sonnet-4.5', 
-      label: '🧠 Sonnet (Smart)',
+      label: 'Sonnet (Smart)',
       description: '$3/M tokens'
     },
     { 
       value: 'openrouter/anthropic/claude-opus-4', 
-      label: '💎 Opus (Best)',
+      label: 'Opus (Best)',
       description: '$15/M tokens'
     },
     { 
       value: 'ollama/llama2', 
-      label: '🔒 Ollama Local (Private)',
+      label: 'Ollama Local (Private)',
       description: 'Run locally, 100% private'
     },
   ]
@@ -205,9 +206,10 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSaveTitle}
                 disabled={editLoading || !editedTitle.trim()}
-                className="px-3 py-2 bg-cc-mint text-cc-dark text-sm font-bold rounded hover:opacity-90 disabled:opacity-50"
+                className="px-3 py-2 bg-cc-mint text-cc-dark text-sm font-bold rounded hover:opacity-90 disabled:opacity-50 flex items-center gap-1"
+                title="Save"
               >
-                {editLoading ? '⏳' : '✓'}
+                <HeroIcon name="check-circle" size="sm" color="default" />
               </motion.button>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -215,8 +217,9 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
                 onClick={handleCancelEdit}
                 disabled={editLoading}
                 className="px-3 py-2 glass-effect text-cc-text text-sm font-bold rounded hover:border-cc-orange disabled:opacity-50"
+                title="Cancel"
               >
-                ✕
+                <HeroIcon name="x-mark" size="sm" color="error" />
               </motion.button>
             </div>
             {editError && (
@@ -232,10 +235,10 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsEditingTitle(true)}
-                  className="opacity-0 group-hover:opacity-100 text-cc-text-muted hover:text-cc-mint text-sm"
+                  className="opacity-0 group-hover:opacity-100 text-cc-text-muted hover:text-cc-mint"
                   title="Edit conversation title"
                 >
-                  ✏️
+                  <HeroIcon name="pencil-square" size="sm" color="muted" className="hover:!text-cc-mint" />
                 </motion.button>
               </div>
               <p className="text-xs text-cc-text-muted">{currentConversation.description || 'No description'}</p>
@@ -249,7 +252,9 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-center">
             <div className="text-cc-text-muted">
-              <div className="text-4xl mb-2">👋</div>
+              <div className="mb-2">
+                <HeroIcon name="chat-bubble-left" size="xl" color="muted" className="mx-auto" />
+              </div>
               <p>Start a conversation</p>
             </div>
           </div>
@@ -303,7 +308,10 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
         {/* File Selection */}
         {files.length > 0 && (
           <div className="flex gap-2 items-center flex-wrap">
-            <label className="text-xs font-semibold text-cc-text-muted">Attach files:</label>
+            <label className="text-xs font-semibold text-cc-text-muted flex items-center gap-1">
+              <HeroIcon name="folder" size="xs" color="muted" />
+              Attach files:
+            </label>
             {files.map(file => (
               <motion.button
                 key={file.id}
@@ -316,14 +324,15 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
                       : [...prev, file.id]
                   )
                 }}
-                className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                className={`px-3 py-1 rounded text-xs font-medium transition-all flex items-center gap-1 ${
                   selectedFiles.includes(file.id)
                     ? 'bg-cc-mint text-cc-dark'
                     : 'glass-effect text-cc-text hover:border-cc-mint'
                 }`}
                 title={`${file.file_size} bytes`}
               >
-                📎 {file.filename}
+                <HeroIcon name="document" size="xs" color="default" className={selectedFiles.includes(file.id) ? '!text-cc-dark' : ''} />
+                {file.filename}
               </motion.button>
             ))}
           </div>
@@ -363,9 +372,14 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
             whileTap={{ scale: 0.95 }}
             onClick={handleSendMessage}
             disabled={loading || !newMessage.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-cc-pink to-cc-orange text-cc-dark font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
+            className="px-6 py-3 bg-gradient-to-r from-cc-pink to-cc-orange text-cc-dark font-bold rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center gap-2"
+            title="Send message"
           >
-            {loading ? '⏳' : '✈️'}
+            {loading ? (
+              <HeroIcon name="arrow-path" size="sm" color="default" className="animate-spin" />
+            ) : (
+              <HeroIcon name="paper-airplane" size="sm" color="default" />
+            )}
           </motion.button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import CreateProjectModal from './CreateProjectModal'
 import ProjectDashboard from './ProjectDashboard'
 import ProjectSettings from './ProjectSettings'
+import HeroIcon from './Icon'
 
 export default function MainContent({
   project,
@@ -41,9 +42,10 @@ export default function MainContent({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowSettings(true)}
-              className="px-4 py-2 rounded-lg glass-effect text-cc-text text-sm font-medium hover:border-cc-blue"
+              className="px-4 py-2 rounded-lg glass-effect text-cc-text text-sm font-medium hover:border-cc-blue flex items-center gap-2"
             >
-              ⚙️ Settings
+              <HeroIcon name="cog" size="sm" color="default" />
+              Settings
             </motion.button>
           </div>
         )}
