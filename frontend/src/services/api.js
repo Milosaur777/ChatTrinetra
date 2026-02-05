@@ -1,7 +1,17 @@
 import axios from 'axios'
 
-// Use environment variable if provided, otherwise default to /api (for dev)
-const baseURL = import.meta.env.VITE_API_URL || '/api'
+// Determine API URL based on environment
+let baseURL = '/api'
+
+// If frontend and backend are on different hosts, use full URL
+if (import.meta.env.VITE_API_URL) {
+  baseURL = import.meta.env.VITE_API_URL
+} else if (!import.meta.env.DEV && window.location.hostname !== 'localhost') {
+  // In production on a remote host, use the same domain but port 3001
+  baseURL = `http://${window.location.hostname}:3001/api`
+}
+
+console.log('📡 API Base URL:', baseURL)
 
 const api = axios.create({
   baseURL,
