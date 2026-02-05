@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import SearchBar from './SearchBar'
 
 export default function Sidebar({
   projects,
@@ -53,6 +54,13 @@ export default function Sidebar({
         >
           + New Project
         </motion.button>
+
+        {/* Search Bar */}
+        <SearchBar
+          projects={projects}
+          onSelectProject={onSelectProject}
+          placeholder="Search projects..."
+        />
       </div>
 
       {/* Projects List */}
