@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Sidebar from './components/Sidebar'
 import MainContent from './components/MainContent'
+import HealthIndicator from './components/HealthIndicator'
 import api from './services/api'
 
 function App() {
@@ -58,6 +59,9 @@ function App() {
       animate={{ opacity: 1 }}
       className="flex h-screen w-screen bg-cc-dark overflow-hidden"
     >
+      {/* Health Indicator */}
+      <HealthIndicator />
+
       {/* Sidebar */}
       <Sidebar
         projects={projects}
