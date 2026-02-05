@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import HeroIcon from './Icon'
 
 export default function CreateProjectModal({ onCreate, onClose }) {
   const [formData, setFormData] = useState({
@@ -227,9 +228,19 @@ export default function CreateProjectModal({ onCreate, onClose }) {
               disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-cc-mint to-cc-blue text-cc-dark font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-cc-mint to-cc-blue text-cc-dark font-bold rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? '⏳ Creating...' : '✨ Create Project'}
+              {loading ? (
+                <>
+                  <HeroIcon name="arrow-path" size="sm" color="default" className="animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <HeroIcon name="plus" size="sm" color="default" className="!text-cc-dark" />
+                  Create Project
+                </>
+              )}
             </motion.button>
 
             <motion.button

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import api from '../services/api'
+import HeroIcon from './Icon'
 
 export default function FileUpload({ projectId, onUpload }) {
   const [dragActive, setDragActive] = useState(false)
@@ -67,15 +68,18 @@ export default function FileUpload({ projectId, onUpload }) {
           : 'border-2 border-dashed border-glass hover:border-cc-blue'
       }`}
     >
-      <div className="text-3xl mb-2">📤</div>
+      <div className="mb-2">
+        <HeroIcon name="arrow-up-tray" size="xl" color="primary" className="mx-auto" />
+      </div>
       <h4 className="font-semibold text-cc-text mb-1">Upload Files</h4>
       <p className="text-xs text-cc-text-muted mb-3">
         PDF, Excel, Word documents
       </p>
       <motion.label
         whileHover={{ scale: 1.05 }}
-        className="inline-block px-4 py-2 bg-gradient-to-r from-cc-blue to-cc-pink text-cc-dark text-sm font-bold rounded-lg cursor-pointer"
+        className="inline-block px-4 py-2 bg-gradient-to-r from-cc-blue to-cc-pink text-cc-dark text-sm font-bold rounded-lg cursor-pointer flex items-center gap-2"
       >
+        <HeroIcon name="folder" size="sm" color="default" className="!text-cc-dark" />
         Choose Files
         <input
           ref={fileInputRef}
@@ -88,7 +92,10 @@ export default function FileUpload({ projectId, onUpload }) {
         />
       </motion.label>
       {uploading && (
-        <p className="text-xs text-cc-mint mt-3">⏳ Uploading...</p>
+        <div className="text-xs text-cc-mint mt-3 flex items-center justify-center gap-1">
+          <HeroIcon name="arrow-path" size="xs" color="primary" className="animate-spin" />
+          Uploading...
+        </div>
       )}
     </motion.div>
   )

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import HeroIcon from './Icon'
 
 export default function HealthIndicator() {
   const [isHealthy, setIsHealthy] = useState(true)
@@ -26,10 +27,10 @@ export default function HealthIndicator() {
 
   return (
     <div
-      className="fixed top-4 right-4 z-50 text-red-500 text-lg"
+      className="fixed top-4 right-4 z-50"
       title="Backend is currently down"
     >
-      ℹ️
+      <HeroIcon name="information-circle" size="lg" color="error" />
     </div>
   )
 }

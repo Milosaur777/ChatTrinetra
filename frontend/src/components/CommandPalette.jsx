@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useCommandPalette } from '../contexts/CommandPaletteContext'
 import searchEngine from '../services/searchEngine'
+import HeroIcon from './Icon'
 
 /**
  * CommandPalette Component
@@ -141,9 +142,13 @@ export default function CommandPalette({ projects, files }) {
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <span className="text-lg flex-shrink-0 mt-0.5">
-            {isProject ? '📁' : '📄'}
-          </span>
+          <div className="flex-shrink-0 mt-0.5">
+            <HeroIcon 
+              name={isProject ? 'folder' : 'document'} 
+              size="md" 
+              color="primary" 
+            />
+          </div>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
@@ -192,7 +197,7 @@ export default function CommandPalette({ projects, files }) {
               {/* Input */}
               <div className="p-4 border-b border-cc-border bg-cc-dark bg-opacity-50">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl opacity-60">🔍</span>
+                  <HeroIcon name="magnifying-glass" size="md" color="muted" className="opacity-60" />
                   <input
                     ref={inputRef}
                     type="text"

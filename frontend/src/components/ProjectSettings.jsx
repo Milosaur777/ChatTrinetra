@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import HeroIcon from './Icon'
 
 export default function ProjectSettings({ project, onClose, onUpdate }) {
   const [formData, setFormData] = useState(project || {})
@@ -76,9 +77,10 @@ export default function ProjectSettings({ project, onClose, onUpdate }) {
           <motion.button
             whileHover={{ scale: 1.1 }}
             onClick={onClose}
-            className="text-cc-text-muted hover:text-cc-text text-2xl"
+            className="text-cc-text-muted hover:text-cc-text"
+            title="Close"
           >
-            ✕
+            <HeroIcon name="x-mark" size="lg" color="muted" className="hover:!text-cc-text" />
           </motion.button>
         </div>
 
@@ -269,9 +271,10 @@ export default function ProjectSettings({ project, onClose, onUpdate }) {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleDeleteFile(file.id)}
-                      className="text-cc-pink hover:text-red-400 font-bold"
+                      className="text-cc-pink hover:text-red-400"
+                      title="Delete file"
                     >
-                      🗑️
+                      <HeroIcon name="trash" size="sm" color="error" className="!text-cc-pink hover:!text-red-400" />
                     </motion.button>
                   </div>
                 ))}
@@ -286,9 +289,19 @@ export default function ProjectSettings({ project, onClose, onUpdate }) {
               disabled={loading}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-cc-mint to-cc-blue text-cc-dark font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-cc-mint to-cc-blue text-cc-dark font-bold rounded-lg hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? '⏳ Saving...' : '💾 Save Settings'}
+              {loading ? (
+                <>
+                  <HeroIcon name="arrow-path" size="sm" color="default" className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <HeroIcon name="arrow-down-tray" size="sm" color="default" className="!text-cc-dark" />
+                  Save Settings
+                </>
+              )}
             </motion.button>
 
             <motion.button

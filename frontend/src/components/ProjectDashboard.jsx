@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import api from '../services/api'
 import ChatWindow from './ChatWindow'
 import FileUpload from './FileUpload'
+import HeroIcon from './Icon'
 
 export default function ProjectDashboard({ project }) {
   const [conversations, setConversations] = useState([])
@@ -87,25 +88,33 @@ export default function ProjectDashboard({ project }) {
         className="grid grid-cols-1 md:grid-cols-4 gap-4"
       >
         <motion.div variants={itemVariants} className="glass-effect p-4 rounded-xl">
-          <div className="text-3xl mb-2">💬</div>
+          <div className="mb-2">
+            <HeroIcon name="chat-bubble-left" size="lg" color="primary" />
+          </div>
           <div className="text-2xl font-bold text-cc-text">{conversations.length}</div>
           <div className="text-xs text-cc-text-muted">Conversations</div>
         </motion.div>
 
         <motion.div variants={itemVariants} className="glass-effect p-4 rounded-xl">
-          <div className="text-3xl mb-2">📄</div>
+          <div className="mb-2">
+            <HeroIcon name="document" size="lg" color="primary" />
+          </div>
           <div className="text-2xl font-bold text-cc-text">{files.length}</div>
           <div className="text-xs text-cc-text-muted">Files Uploaded</div>
         </motion.div>
 
         <motion.div variants={itemVariants} className="glass-effect p-4 rounded-xl">
-          <div className="text-3xl mb-2">🤖</div>
+          <div className="mb-2">
+            <HeroIcon name="cog" size="lg" color="primary" />
+          </div>
           <div className="text-sm font-semibold text-cc-mint truncate">{project.tone}</div>
           <div className="text-xs text-cc-text-muted">Tone</div>
         </motion.div>
 
         <motion.div variants={itemVariants} className="glass-effect p-4 rounded-xl">
-          <div className="text-3xl mb-2">🌐</div>
+          <div className="mb-2">
+            <HeroIcon name="globe-alt" size="lg" color="primary" />
+          </div>
           <div className="text-sm font-semibold text-cc-blue truncate">{project.language}</div>
           <div className="text-xs text-cc-text-muted">Language</div>
         </motion.div>
@@ -193,7 +202,9 @@ export default function ProjectDashboard({ project }) {
           ) : (
             <div className="glass-effect p-8 rounded-xl h-full flex items-center justify-center">
               <div className="text-center">
-                <div className="text-4xl mb-4">💬</div>
+                <div className="mb-4">
+                  <HeroIcon name="chat-bubble-left" size="xl" color="muted" className="mx-auto" />
+                </div>
                 <p className="text-cc-text-muted">Create or select a conversation to start</p>
               </div>
             </div>
