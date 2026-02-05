@@ -154,10 +154,26 @@ const { isOpen, openPalette } = useCommandPalette()
 **Changes:**
 - ❌ Remove the embedded SearchBar component
 - ❌ Remove the search input UI
-- ✅ Add keyboard hint "Press Cmd+K to search"
-- ✅ Maybe add a subtle search icon button that opens palette
+- ✅ Add **small magnifying glass icon button** (Linear.app style)
+  - Position: Top right of Sidebar header (near + New Project)
+  - Icon: Clean, minimal 🔍 (16-20px)
+  - Hover: Subtle background highlight
+  - Click: Opens Command Palette
+- ✅ Tooltip on hover: "Search (Cmd+K)" or "Search (Ctrl+K)"
 
-**Result:** Sidebar becomes 20-30% smaller, cleaner interface
+**Icon Placement:**
+```
+┌─────────────────────────┐
+│ 🏴☠️ CaptainClaw    🔍  │  ← Search icon (small, top right)
+│ AI Projects              │
+├─────────────────────────┤
+│ + New Project            │
+│ ├─ Project 1             │
+│ ├─ Project 2             │
+│ └─ Project 3             │
+```
+
+**Result:** Sidebar 20-30% smaller, search discoverable via button + keyboard shortcut
 
 ---
 
@@ -253,6 +269,9 @@ frontend/
 
 **Must Have:**
 - ✅ Cmd+K / Ctrl+K opens palette from anywhere
+- ✅ **Small magnifying glass icon in Sidebar (Linear.app style)**
+- ✅ Icon click opens Command Palette
+- ✅ Icon has tooltip "Search (Cmd+K)" / "Search (Ctrl+K)"
 - ✅ Escape closes palette
 - ✅ Arrow keys navigate results
 - ✅ Enter selects project/file
@@ -325,23 +344,45 @@ frontend/
 
 ---
 
-## 📞 Questions for Review
+## 🚀 Implementation Strategy
 
-1. **Keyboard Shortcut:** Happy with Cmd+K / Ctrl+K? (VS Code/GitHub standard)
-2. **Styling:** Centered modal OK? Or prefer slide-up from bottom?
-3. **Scope:** Should we include ANY functionality beyond search? (e.g., "Create new project" commands?)
-4. **Mobile:** Add a search button in header for mobile users?
-5. **Timeline:** Ready to proceed with Phase 1 after approval?
+**Approach:** Serial tasks with single agent OR parallel sub-agents
+- Linear.app style requires sequential integration points
+- Can parallelize components if structured properly
+- Recommend: **1 serial agent** for cleaner integration
+
+**Suggested Execution Order:**
+1. Build CommandPaletteContext (foundation)
+2. Build CommandPalette component (modal)
+3. Add useCommandPaletteShortcut hook
+4. Add search icon button to Sidebar
+5. Remove old SearchBar from Sidebar
+6. Wire up App root with provider
+7. Polish & test
+8. Document
+
+**Note:** Each task should be atomic - one commit per task for clean history.
 
 ---
 
-## ✅ Sign-off Checklist
+## 📞 Approved Updates
 
-- [ ] Milo approves architecture
-- [ ] Milo approves keyboard shortcut (Cmd+K)
-- [ ] Milo approves styling direction
-- [ ] Milo approves scope (search only vs commands too)
-- [ ] Ready to schedule sub-agent teams
+✅ **Milo approved addition:**
+- Small magnifying glass icon in Sidebar (Linear.app style)
+- Icon acts as button to open Command Palette
+- Button + Keyboard shortcut = dual-mode access
+
+---
+
+## ✅ Ready for Implementation
+
+✅ Architecture approved
+✅ Keyboard shortcut approved (Cmd+K)
+✅ Linear.app-style icon button approved
+✅ Scope clear (search only, future commands)
+✅ Ready to deploy agents!
+
+**Next Step:** Spawn serial task agent to execute all 5 phases
 
 ---
 
