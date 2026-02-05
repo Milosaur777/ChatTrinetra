@@ -7,13 +7,17 @@ import searchEngine from '../services/searchEngine'
  * CommandPalette Component
  * Modal search interface with keyboard shortcuts and fuzzy search
  * Displays results grouped by Projects and Files
+ * Features:
+ * - Fuzzy search with Fuse.js
+ * - Keyboard navigation (↑↓ arrows, Enter, Escape)
+ * - Results grouped by type (Projects/Files)
+ * - Real-time search results
  */
 export default function CommandPalette({ projects, files }) {
   const {
     isOpen,
     searchQuery,
     results,
-    selectedIndex,
     closePalette,
     setQuery,
     setResults,
@@ -22,7 +26,9 @@ export default function CommandPalette({ projects, files }) {
   } = useCommandPalette()
 
   const [allResults, setAllResults] = useState([])
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef(null)
+  const resultsRef = useRef(null)
 
   // Flatten results into a single array for navigation
   useEffect(() => {
@@ -41,10 +47,13 @@ export default function CommandPalette({ projects, files }) {
     setAllResults(flat)
   }, [results])
 
-  // Focus input when palette opens
+  // Focus input when palette opens and reset selection
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus()
+    if (isOpen) {
+      setSelectedIndex(0)
+      if (inputRef.current) {
+        inputRef.current.focus()
+      }
     }
   }, [isOpen])
 
@@ -69,6 +78,7 @@ export default function CommandPalette({ projects, files }) {
     } else {
       setResults({ projects: [], files: [] })
     }
+    setSelectedIndex(0)
   }
 
   // Handle keyboard navigation
@@ -81,12 +91,14 @@ export default function CommandPalette({ projects, files }) {
 
       case 'ArrowDown':
         e.preventDefault()
-        // Navigate down through results
+        setSelectedIndex((prev) =>
+          prev < allResults.length - 1 ? prev + 1 : prev
+        )
         break
 
       case 'ArrowUp':
         e.preventDefault()
-        // Navigate up through results
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev))
         break
 
       case 'Enter':
@@ -221,9 +233,7 @@ export default function CommandPalette({ projects, files }) {
                                 item: result.item,
                                 score: result.score,
                               }}
-                              isSelected={
-                                selectedIndex === idx && results.projects.length > 0
-                              }
+                              isSelected={selectedIndex === idx}
                             />
                           ))}
                         </div>
