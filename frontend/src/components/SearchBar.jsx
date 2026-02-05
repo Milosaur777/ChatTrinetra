@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import searchEngine from '../services/searchEngine'
+import HeroIcon from './Icon'
 
 export default function SearchBar({ 
   projects = [], 
@@ -107,7 +108,7 @@ export default function SearchBar({
     <div className="relative w-full" ref={containerRef}>
       {/* Search Input */}
       <div className="flex items-center gap-3 px-4 py-3 bg-cc-darker border border-cc-border rounded-lg hover:border-cc-accent transition-colors focus-within:border-cc-accent focus-within:shadow-lg focus-within:shadow-cc-accent/10">
-        <span className="text-cc-accent text-lg flex-shrink-0">🔍</span>
+        <HeroIcon name="magnifying-glass" size="sm" color="primary" className="flex-shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -128,7 +129,7 @@ export default function SearchBar({
             className="text-cc-text-muted hover:text-cc-accent transition-colors flex-shrink-0"
             aria-label="Clear search"
           >
-            ✕
+            <HeroIcon name="x-mark" size="sm" color="muted" className="hover:!text-cc-accent" />
           </button>
         )}
       </div>
@@ -166,8 +167,9 @@ export default function SearchBar({
                     transition={{ delay: 0.05 }}
                     className="border-b border-cc-border"
                   >
-                    <div className="sticky top-0 px-4 py-2 bg-cc-dark bg-opacity-80 backdrop-blur-sm text-xs font-bold text-cc-accent uppercase tracking-wider">
-                      📁 Projects
+                    <div className="sticky top-0 px-4 py-2 bg-cc-dark bg-opacity-80 backdrop-blur-sm text-xs font-bold text-cc-accent uppercase tracking-wider flex items-center gap-2">
+                      <HeroIcon name="folder" size="sm" color="primary" />
+                      Projects
                     </div>
                     <div>
                       {results.projects.map((result, idx) => {
@@ -212,8 +214,9 @@ export default function SearchBar({
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.1 }}
                   >
-                    <div className="sticky top-0 px-4 py-2 bg-cc-dark bg-opacity-80 backdrop-blur-sm text-xs font-bold text-cc-accent uppercase tracking-wider">
-                      📄 Files
+                    <div className="sticky top-0 px-4 py-2 bg-cc-dark bg-opacity-80 backdrop-blur-sm text-xs font-bold text-cc-accent uppercase tracking-wider flex items-center gap-2">
+                      <HeroIcon name="document" size="sm" color="primary" />
+                      Files
                     </div>
                     <div>
                       {results.files.map((result, idx) => {

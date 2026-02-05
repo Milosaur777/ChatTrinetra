@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useCommandPalette } from '../contexts/CommandPaletteContext'
+import HeroIcon from './Icon'
 
 export default function Sidebar({
   projects,
@@ -53,9 +54,9 @@ export default function Sidebar({
             whileTap={{ scale: 0.95 }}
             onClick={openPalette}
             title="Search (Cmd+K)"
-            className="p-2 rounded-lg hover:bg-cc-accent hover:bg-opacity-20 transition-colors text-xl"
+            className="p-2 rounded-lg hover:bg-cc-accent hover:bg-opacity-20 transition-colors"
           >
-            🔍
+            <HeroIcon name="magnifying-glass" size="md" color="primary" />
           </motion.button>
         </div>
 
@@ -79,7 +80,7 @@ export default function Sidebar({
       >
         {loading ? (
           <div className="text-center py-8">
-            <div className="inline-block animate-spin text-2xl">⚙️</div>
+            <HeroIcon name="arrow-path" size="lg" color="primary" className="inline-block animate-spin" />
           </div>
         ) : projects.length === 0 ? (
           <div className="text-center py-8 text-cc-text-muted text-sm">
@@ -118,9 +119,10 @@ export default function Sidebar({
                     e.stopPropagation()
                     onDeleteProject(project.id)
                   }}
-                  className="absolute top-2 right-2 text-cc-pink hover:text-red-400 text-xs font-bold"
+                  className="absolute top-2 right-2 text-cc-pink hover:text-red-400"
+                  title="Delete project"
                 >
-                  ✕
+                  <HeroIcon name="x-mark" size="sm" color="error" className="!text-cc-pink hover:!text-red-400" />
                 </motion.button>
               )}
             </motion.div>
