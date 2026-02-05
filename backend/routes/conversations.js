@@ -73,20 +73,83 @@ router.post('/', async (req, res) => {
   }
 });
 
-// UPDATE conversation
+// UPDATE conversation (PUT - full update)
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description } = req.body;
     const now = new Date().toISOString();
 
+    // Verify conversation exists
+    const conversation = await db.get('SELECT * FROM conversations WHERE id = ?', [id]);
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    // Validate title if provided
+    if (title && !title.trim()) {
+      return res.status(400).json({ error: 'Title cannot be empty' });
+    }
+
     await db.run(
       'UPDATE conversations SET title = ?, description = ?, updated_at = ? WHERE id = ?',
       [title || null, description || null, now, id]
     );
 
+    const updatedConversation = await db.get('SELECT * FROM conversations WHERE id = ?', [id]);
+    res.json({ success: true, conversation: updatedConversation });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE conversation (PATCH - partial update)
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const now = new Date().toISOString();
+
+    // Verify conversation exists
     const conversation = await db.get('SELECT * FROM conversations WHERE id = ?', [id]);
-    res.json(conversation);
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    // Validate title if provided
+    if (title !== undefined && title !== null && !String(title).trim()) {
+      return res.status(400).json({ error: 'Title cannot be empty' });
+    }
+
+    // Build update query based on what was provided
+    const updates = [];
+    const params = [];
+
+    if (title !== undefined) {
+      updates.push('title = ?');
+      params.push(title);
+    }
+
+    if (description !== undefined) {
+      updates.push('description = ?');
+      params.push(description);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: 'No fields to update' });
+    }
+
+    updates.push('updated_at = ?');
+    params.push(now);
+    params.push(id);
+
+    await db.run(
+      `UPDATE conversations SET ${updates.join(', ')} WHERE id = ?`,
+      params
+    );
+
+    const updatedConversation = await db.get('SELECT * FROM conversations WHERE id = ?', [id]);
+    res.json({ success: true, conversation: updatedConversation });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
