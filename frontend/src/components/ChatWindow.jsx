@@ -172,7 +172,7 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'assistant',
-        content: '❌ Failed to send message. Make sure backend is running on port 3001.',
+        content: 'Failed to send message. Make sure backend is running on port 3001.',
         created_at: new Date().toISOString()
       }])
     } finally {
