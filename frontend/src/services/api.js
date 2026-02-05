@@ -1,15 +1,8 @@
 import axios from 'axios'
 
-// Determine API URL based on environment
-let baseURL = '/api'
-
-// If frontend and backend are on different hosts, use full URL
-if (import.meta.env.VITE_API_URL) {
-  baseURL = import.meta.env.VITE_API_URL
-} else if (!import.meta.env.DEV && window.location.hostname !== 'localhost') {
-  // In production on a remote host, use the same domain but port 3001
-  baseURL = `http://${window.location.hostname}:3001/api`
-}
+// Always use /api which NGINX proxies to backend
+// NGINX config routes /api/* to localhost:3001
+const baseURL = '/api'
 
 console.log('📡 API Base URL:', baseURL)
 
