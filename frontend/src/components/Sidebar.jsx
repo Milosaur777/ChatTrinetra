@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import SearchBar from './SearchBar'
+import { useCommandPalette } from '../contexts/CommandPaletteContext'
 
 export default function Sidebar({
   projects,
@@ -11,6 +11,7 @@ export default function Sidebar({
   loading
 }) {
   const [hoveredId, setHoveredId] = useState(null)
+  const { openPalette } = useCommandPalette()
 
   const containerVariants = {
     hidden: { opacity: 0, x: -20 },
@@ -37,12 +38,25 @@ export default function Sidebar({
     >
       {/* Header */}
       <div className="p-6 border-b border-glass-600">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="text-3xl">🏴‍☠️</div>
-          <div>
-            <h1 className="text-xl font-bold text-cc-text">CaptainClaw</h1>
-            <p className="text-xs text-cc-text-muted">AI Projects</p>
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl">🏴‍☠️</div>
+            <div>
+              <h1 className="text-xl font-bold text-cc-text">CaptainClaw</h1>
+              <p className="text-xs text-cc-text-muted">AI Projects</p>
+            </div>
           </div>
+
+          {/* Search Icon Button */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openPalette}
+            title="Search (Cmd+K)"
+            className="p-2 rounded-lg hover:bg-cc-accent hover:bg-opacity-20 transition-colors text-xl"
+          >
+            🔍
+          </motion.button>
         </div>
 
         {/* New Project Button */}
@@ -54,13 +68,6 @@ export default function Sidebar({
         >
           + New Project
         </motion.button>
-
-        {/* Search Bar */}
-        <SearchBar
-          projects={projects}
-          onSelectProject={onSelectProject}
-          placeholder="Search projects..."
-        />
       </div>
 
       {/* Projects List */}
