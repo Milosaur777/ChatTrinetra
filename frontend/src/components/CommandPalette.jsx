@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useCommandPalette } from '../contexts/CommandPaletteContext'
 import searchEngine from '../services/searchEngine'
 
@@ -125,11 +124,7 @@ export default function CommandPalette({ projects, files }) {
     const isProject = type === 'project'
 
     return (
-      <motion.div
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: index * 0.02 }}
-        whileHover={{ backgroundColor: 'rgba(0, 255, 200, 0.1)', x: 4 }}
+      <div
         onClick={() => {
           if (isProject) {
             selectProject(item)
@@ -138,21 +133,17 @@ export default function CommandPalette({ projects, files }) {
           }
           closePalette()
         }}
-        className={`p-3 cursor-pointer rounded-lg transition-all ${
+        className={`p-3 cursor-pointer rounded-lg ${
           isSelected
             ? 'bg-cc-accent bg-opacity-20 border border-cc-accent'
-            : 'border border-transparent'
+            : 'border border-transparent hover:bg-cc-accent hover:bg-opacity-10'
         }`}
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <motion.span
-            className="text-lg flex-shrink-0 mt-0.5"
-            animate={isSelected ? { scale: 1.1 } : { scale: 1 }}
-            transition={{ duration: 0.2 }}
-          >
+          <span className="text-lg flex-shrink-0 mt-0.5">
             {isProject ? '📁' : '📄'}
-          </motion.span>
+          </span>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
@@ -167,15 +158,11 @@ export default function CommandPalette({ projects, files }) {
           </div>
 
           {/* Score */}
-          <motion.div
-            className="text-xs text-cc-text-muted flex-shrink-0"
-            animate={isSelected ? { opacity: 1 } : { opacity: 0.6 }}
-            transition={{ duration: 0.2 }}
-          >
+          <div className={`text-xs flex-shrink-0 ${isSelected ? 'text-cc-text-muted' : 'text-cc-text-muted opacity-60'}`}>
             {Math.round((1 - result.score) * 100)}%
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     )
   }
 
@@ -188,24 +175,17 @@ export default function CommandPalette({ projects, files }) {
   const hasResults = allResults.length > 0
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={closePalette}
             className="fixed inset-0 z-40 bg-black bg-opacity-50"
           />
 
           {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          <div
             className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl"
           >
             <div className="mx-4 rounded-xl border border-cc-border bg-cc-darker shadow-2xl overflow-hidden hover:border-cc-accent hover:border-opacity-50 transition-all duration-200">
@@ -229,10 +209,7 @@ export default function CommandPalette({ projects, files }) {
               {/* Results */}
               <div className="max-h-96 overflow-y-auto bg-cc-dark" ref={resultsRef}>
                 {hasResults ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.1 }}
+                  <div
                     className="p-4 space-y-6"
                   >
                     {/* Projects Group */}
@@ -283,36 +260,29 @@ export default function CommandPalette({ projects, files }) {
                         </div>
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 ) : searchQuery.trim().length >= 2 ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                  <div
                     className="p-12 text-center"
                   >
                     <p className="text-cc-text-muted">No results found</p>
                     <p className="text-xs text-cc-text-muted mt-2">
                       Try a different search term
                     </p>
-                  </motion.div>
+                  </div>
                 ) : (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                  <div
                     className="p-12 text-center"
                   >
                     <p className="text-cc-text-muted">
                       Start typing to search...
                     </p>
-                  </motion.div>
+                  </div>
                 )}
               </div>
 
               {/* Footer */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
+              <div
                 className="p-3 border-t border-cc-border bg-cc-darker text-xs text-cc-text-muted flex items-center justify-between"
               >
                 <div className="flex items-center gap-2">
@@ -326,18 +296,17 @@ export default function CommandPalette({ projects, files }) {
                   <span className="opacity-40">Close</span>
                 </div>
                 {hasResults && (
-                  <motion.div
-                    animate={{ opacity: 1 }}
+                  <div
                     className="text-right text-cc-accent"
                   >
                     {selectedIndex + 1} / {allResults.length}
-                  </motion.div>
+                  </div>
                 )}
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    </>
   )
 }
