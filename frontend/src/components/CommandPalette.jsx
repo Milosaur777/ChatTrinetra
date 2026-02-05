@@ -120,13 +120,16 @@ export default function CommandPalette({ projects, files }) {
   }
 
   // Result item component
-  const ResultItem = ({ result, isSelected }) => {
+  const ResultItem = ({ result, isSelected, index }) => {
     const { type, item } = result
     const isProject = type === 'project'
 
     return (
       <motion.div
-        whileHover={{ backgroundColor: 'rgba(0, 255, 200, 0.1)' }}
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.02 }}
+        whileHover={{ backgroundColor: 'rgba(0, 255, 200, 0.1)', x: 4 }}
         onClick={() => {
           if (isProject) {
             selectProject(item)
@@ -135,15 +138,21 @@ export default function CommandPalette({ projects, files }) {
           }
           closePalette()
         }}
-        className={`p-3 cursor-pointer rounded-lg transition-colors ${
-          isSelected ? 'bg-cc-accent bg-opacity-20 border border-cc-accent' : ''
+        className={`p-3 cursor-pointer rounded-lg transition-all ${
+          isSelected
+            ? 'bg-cc-accent bg-opacity-20 border border-cc-accent'
+            : 'border border-transparent'
         }`}
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <span className="text-lg flex-shrink-0 mt-0.5">
+          <motion.span
+            className="text-lg flex-shrink-0 mt-0.5"
+            animate={isSelected ? { scale: 1.1 } : { scale: 1 }}
+            transition={{ duration: 0.2 }}
+          >
             {isProject ? '📁' : '📄'}
-          </span>
+          </motion.span>
 
           {/* Content */}
           <div className="flex-1 min-w-0">
@@ -158,9 +167,13 @@ export default function CommandPalette({ projects, files }) {
           </div>
 
           {/* Score */}
-          <div className="text-xs text-cc-text-muted flex-shrink-0">
+          <motion.div
+            className="text-xs text-cc-text-muted flex-shrink-0"
+            animate={isSelected ? { opacity: 1 } : { opacity: 0.6 }}
+            transition={{ duration: 0.2 }}
+          >
             {Math.round((1 - result.score) * 100)}%
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     )
@@ -195,22 +208,26 @@ export default function CommandPalette({ projects, files }) {
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className="fixed top-20 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl"
           >
-            <div className="mx-4 rounded-xl border border-cc-border bg-cc-darker shadow-2xl overflow-hidden">
+            <div className="mx-4 rounded-xl border border-cc-border bg-cc-darker shadow-2xl overflow-hidden hover:border-cc-accent hover:border-opacity-50 transition-all duration-200">
               {/* Input */}
-              <div className="p-4 border-b border-cc-border">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search projects or files..."
-                  value={searchQuery}
-                  onChange={handleQueryChange}
-                  onKeyDown={handleKeyDown}
-                  className="w-full bg-transparent text-cc-text placeholder-cc-text-muted text-lg outline-none"
-                />
+              <div className="p-4 border-b border-cc-border bg-cc-dark bg-opacity-50">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl opacity-60">🔍</span>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="Search projects or files..."
+                    value={searchQuery}
+                    onChange={handleQueryChange}
+                    onKeyDown={handleKeyDown}
+                    className="flex-1 bg-transparent text-cc-text placeholder-cc-text-muted text-lg outline-none"
+                    autoComplete="off"
+                  />
+                </div>
               </div>
 
               {/* Results */}
-              <div className="max-h-96 overflow-y-auto">
+              <div className="max-h-96 overflow-y-auto bg-cc-dark" ref={resultsRef}>
                 {hasResults ? (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -234,6 +251,7 @@ export default function CommandPalette({ projects, files }) {
                                 score: result.score,
                               }}
                               isSelected={selectedIndex === idx}
+                              index={idx}
                             />
                           ))}
                         </div>
@@ -259,6 +277,7 @@ export default function CommandPalette({ projects, files }) {
                                 selectedIndex ===
                                 groupedResults.projects.length + idx
                               }
+                              index={groupedResults.projects.length + idx}
                             />
                           ))}
                         </div>
@@ -290,20 +309,31 @@ export default function CommandPalette({ projects, files }) {
               </div>
 
               {/* Footer */}
-              <div className="p-3 border-t border-cc-border bg-cc-dark bg-opacity-50 text-xs text-cc-text-muted flex items-center justify-between">
-                <div>
-                  <span>↑↓ Navigate</span>
-                  <span className="mx-2">•</span>
-                  <span>⏎ Select</span>
-                  <span className="mx-2">•</span>
-                  <span>Esc Close</span>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="p-3 border-t border-cc-border bg-cc-darker text-xs text-cc-text-muted flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="opacity-60">↑↓</span>
+                  <span className="opacity-40">Navigate</span>
+                  <span className="mx-1 opacity-40">•</span>
+                  <span className="opacity-60">⏎</span>
+                  <span className="opacity-40">Select</span>
+                  <span className="mx-1 opacity-40">•</span>
+                  <span className="opacity-60">Esc</span>
+                  <span className="opacity-40">Close</span>
                 </div>
                 {hasResults && (
-                  <div className="text-right">
+                  <motion.div
+                    animate={{ opacity: 1 }}
+                    className="text-right text-cc-accent"
+                  >
                     {selectedIndex + 1} / {allResults.length}
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </>
