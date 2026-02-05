@@ -55,6 +55,15 @@ export default function ProjectDashboard({ project }) {
     }
   }
 
+  const handleConversationUpdate = (updatedConversation) => {
+    // Update the conversation in the list
+    setConversations(conversations.map(conv =>
+      conv.id === updatedConversation.id ? updatedConversation : conv
+    ))
+    // Update the selected conversation
+    setSelectedConv(updatedConversation)
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -176,7 +185,11 @@ export default function ProjectDashboard({ project }) {
           className="lg:col-span-2 overflow-hidden"
         >
           {selectedConv ? (
-            <ChatWindow conversation={selectedConv} files={files} />
+            <ChatWindow 
+              conversation={selectedConv} 
+              files={files}
+              onConversationUpdate={handleConversationUpdate}
+            />
           ) : (
             <div className="glass-effect p-8 rounded-xl h-full flex items-center justify-center">
               <div className="text-center">

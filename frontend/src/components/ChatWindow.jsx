@@ -2,13 +2,19 @@ import { motion } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 import api from '../services/api'
 
-export default function ChatWindow({ conversation, files }) {
+export default function ChatWindow({ conversation, files, onConversationUpdate }) {
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState('openrouter/anthropic/claude-haiku-4.5')
   const [selectedFiles, setSelectedFiles] = useState([])
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [editedTitle, setEditedTitle] = useState(conversation?.title || '')
+  const [editLoading, setEditLoading] = useState(false)
+  const [editError, setEditError] = useState(null)
+  const [currentConversation, setCurrentConversation] = useState(conversation)
   const messagesEndRef = useRef(null)
+  const editInputRef = useRef(null)
 
   // Available models
   const models = [
@@ -47,9 +53,21 @@ export default function ChatWindow({ conversation, files }) {
   // Fetch messages when conversation changes
   useEffect(() => {
     if (conversation) {
+      setCurrentConversation(conversation)
+      setEditedTitle(conversation.title)
+      setIsEditingTitle(false)
+      setEditError(null)
       fetchMessages()
     }
   }, [conversation])
+
+  // Focus edit input when in edit mode
+  useEffect(() => {
+    if (isEditingTitle && editInputRef.current) {
+      editInputRef.current.focus()
+      editInputRef.current.select()
+    }
+  }, [isEditingTitle])
 
   // Scroll to bottom
   useEffect(() => {
@@ -62,6 +80,55 @@ export default function ChatWindow({ conversation, files }) {
       setMessages(response.data)
     } catch (error) {
       console.error('Failed to fetch messages:', error)
+    }
+  }
+
+  const handleSaveTitle = async () => {
+    if (!editedTitle.trim()) {
+      setEditError('Title cannot be empty')
+      return
+    }
+
+    if (editedTitle === currentConversation.title) {
+      setIsEditingTitle(false)
+      return
+    }
+
+    setEditLoading(true)
+    setEditError(null)
+
+    try {
+      const response = await api.patch(`/conversations/${currentConversation.id}`, {
+        title: editedTitle.trim()
+      })
+
+      if (response.data.success) {
+        setCurrentConversation(response.data.conversation)
+        setIsEditingTitle(false)
+        // Notify parent component of the update
+        if (onConversationUpdate) {
+          onConversationUpdate(response.data.conversation)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update conversation:', error)
+      setEditError('Failed to save. Please try again.')
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditedTitle(currentConversation.title)
+    setIsEditingTitle(false)
+    setEditError(null)
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSaveTitle()
+    } else if (e.key === 'Escape') {
+      handleCancelEdit()
     }
   }
 
@@ -86,8 +153,8 @@ export default function ChatWindow({ conversation, files }) {
     setLoading(true)
     try {
       const response = await api.post('/chat/send', {
-        conversation_id: conversation.id,
-        project_id: conversation.project_id,
+        conversation_id: currentConversation.id,
+        project_id: currentConversation.project_id,
         message: userMessage,
         referenced_file_ids: selectedFileIds,
         model: selectedModel
@@ -120,8 +187,61 @@ export default function ChatWindow({ conversation, files }) {
     >
       {/* Header */}
       <div className="mb-4 pb-4 border-b border-glass">
-        <h3 className="text-lg font-bold text-cc-text">{conversation.title}</h3>
-        <p className="text-xs text-cc-text-muted">{conversation.description || 'No description'}</p>
+        {isEditingTitle ? (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2 items-center">
+              <input
+                ref={editInputRef}
+                type="text"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Conversation title..."
+                disabled={editLoading}
+                className="flex-1 px-3 py-2 glass-effect text-cc-text placeholder-cc-text-muted text-base focus:outline-none focus:border-cc-mint disabled:opacity-50"
+              />
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSaveTitle}
+                disabled={editLoading || !editedTitle.trim()}
+                className="px-3 py-2 bg-cc-mint text-cc-dark text-sm font-bold rounded hover:opacity-90 disabled:opacity-50"
+              >
+                {editLoading ? '⏳' : '✓'}
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleCancelEdit}
+                disabled={editLoading}
+                className="px-3 py-2 glass-effect text-cc-text text-sm font-bold rounded hover:border-cc-orange disabled:opacity-50"
+              >
+                ✕
+              </motion.button>
+            </div>
+            {editError && (
+              <p className="text-xs text-cc-pink">{editError}</p>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center justify-between group">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-cc-text">{currentConversation.title}</h3>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsEditingTitle(true)}
+                  className="opacity-0 group-hover:opacity-100 text-cc-text-muted hover:text-cc-mint text-sm"
+                  title="Edit conversation title"
+                >
+                  ✏️
+                </motion.button>
+              </div>
+              <p className="text-xs text-cc-text-muted">{currentConversation.description || 'No description'}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Messages */}
