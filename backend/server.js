@@ -52,8 +52,8 @@ async function startServer() {
     await dbModule.initSchema();
     console.log('✅ Database ready');
 
-    app.listen(PORT, () => {
-      console.log(`🚀 CaptainClaw SaaS Backend running on port ${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 CaptainClaw SaaS Backend running on port ${PORT} (all interfaces)`);
       console.log(`📝 API endpoints:`);
       console.log(`   GET  /api/projects           - List all projects`);
       console.log(`   POST /api/projects           - Create new project`);

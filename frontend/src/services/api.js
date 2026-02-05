@@ -1,7 +1,10 @@
 import axios from 'axios'
 
+// Use environment variable if provided, otherwise default to /api (for dev)
+const baseURL = import.meta.env.VITE_API_URL || '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
