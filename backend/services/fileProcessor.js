@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const pdf = require('pdf-parse');
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const mammoth = require('mammoth');
 
 /**
@@ -15,14 +15,14 @@ const mammoth = require('mammoth');
 async function extractText(filePath, fileType) {
   switch (fileType.toLowerCase()) {
     case '.pdf':
-      return extractPDF(filePath);
+      return await extractPDF(filePath);
     case '.xlsx':
     case '.xls':
-      return extractExcel(filePath);
+      return await extractExcel(filePath);
     case '.docx':
-      return extractWord(filePath);
+      return await extractWord(filePath);
     case '.doc':
-      return extractWord(filePath);
+      return await extractWord(filePath);
     default:
       throw new Error(`Unsupported file type: ${fileType}`);
   }
@@ -45,16 +45,18 @@ async function extractPDF(filePath) {
 /**
  * Extract text from Excel
  */
-function extractExcel(filePath) {
+async function extractExcel(filePath) {
   try {
-    const workbook = XLSX.readFile(filePath);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
     let extractedText = '';
 
-    workbook.SheetNames.forEach(sheetName => {
-      extractedText += `\n=== Sheet: ${sheetName} ===\n`;
-      const worksheet = workbook.Sheets[sheetName];
-      const csvData = XLSX.utils.sheet_to_csv(worksheet);
-      extractedText += csvData;
+    workbook.eachSheet((worksheet, sheetId) => {
+      extractedText += `\n=== Sheet: ${worksheet.name} ===\n`;
+      worksheet.eachRow((row) => {
+        const rowData = row.values.map(cell => cell ? cell.toString() : '').join('\t');
+        extractedText += rowData + '\n';
+      });
     });
 
     return extractedText;
