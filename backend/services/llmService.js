@@ -138,10 +138,12 @@ async function callOllama(messages, system_prompt = '') {
       ? [{ role: 'system', content: system_prompt }, ...messages]
       : messages;
 
+    const ollamaModel = process.env.OLLAMA_MODEL || 'mistral:latest';
+    
     const response = await axios.post(
       'http://localhost:11434/api/chat',
       {
-        model: 'llama2',
+        model: ollamaModel,
         messages: messagesWithSystem,
         stream: false
       }
@@ -149,7 +151,7 @@ async function callOllama(messages, system_prompt = '') {
 
     return {
       content: response.data.message.content,
-      model: 'ollama/llama2',
+      model: `ollama/${ollamaModel}`,
       tokens: 0 // Ollama doesn't track tokens
     };
   } catch (error) {
