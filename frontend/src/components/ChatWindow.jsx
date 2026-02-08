@@ -19,15 +19,33 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
 
   // Available models
   const models = [
+    // Local Models (FREE!)
     { 
-      value: 'openrouter/anthropic/claude-haiku-4.5', 
-      label: 'Haiku (Fast & Free)',
-      description: '$0.25/M tokens'
+      value: 'ollama', 
+      label: 'Ollama Local (Private)',
+      description: 'Mistral 7B'
+    },
+    // OpenAI Models
+    { 
+      value: 'openai/gpt-4o', 
+      label: 'GPT-4o (Latest)',
+      description: 'Best performance'
     },
     { 
-      value: 'openrouter/moonshotai/kimi-k2.5', 
-      label: 'Kimi K2.5 (Great for Code)',
-      description: 'FREE this week!'
+      value: 'openai/gpt-4-turbo', 
+      label: 'GPT-4 Turbo',
+      description: 'Fast & powerful'
+    },
+    { 
+      value: 'openai/gpt-3.5-turbo', 
+      label: 'GPT-3.5 Turbo',
+      description: 'Budget friendly'
+    },
+    // OpenRouter Models
+    { 
+      value: 'openrouter/anthropic/claude-haiku-4.5', 
+      label: 'Haiku (Fast & Cheap)',
+      description: '$0.25/M tokens'
     },
     { 
       value: 'openrouter/google/gemini-flash-1.5', 
@@ -43,11 +61,6 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
       value: 'openrouter/anthropic/claude-opus-4', 
       label: 'Opus (Best)',
       description: '$15/M tokens'
-    },
-    { 
-      value: 'ollama/llama2', 
-      label: 'Ollama Local (Private)',
-      description: 'Run locally, 100% private'
     },
   ]
 

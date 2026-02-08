@@ -7,12 +7,17 @@ const axios = require('axios');
 
 // Model routing logic
 const modelConfig = {
+  // OpenAI models
+  'gpt4o': 'openai/gpt-4o',
+  'gpt4-turbo': 'openai/gpt-4-turbo',
+  'gpt35': 'openai/gpt-3.5-turbo',
+  // OpenRouter models
   'haiku': 'openrouter/anthropic/claude-haiku-4.5',
-  'kimi': 'openrouter/moonshotai/kimi-k2.5',
   'gemini': 'openrouter/google/gemini-flash-1.5',
   'opus': 'openrouter/anthropic/claude-opus-4',
   'sonnet': 'openrouter/anthropic/claude-sonnet-4.5',
   'deepseek': 'openrouter/deepseek/deepseek-r1-distill-qwen-32b',
+  // Local
   'ollama': 'http://localhost:11434/api/chat'
 };
 
@@ -73,8 +78,12 @@ async function chat({ system_prompt, message, file_context, message_history, mod
       content: context + message
     });
 
+    // Call OpenAI
+    if (selectedModel.includes('openai/')) {
+      return await callOpenAI(selectedModel, messages, system_prompt);
+    }
     // Call OpenRouter
-    if (selectedModel.includes('openrouter')) {
+    else if (selectedModel.includes('openrouter')) {
       return await callOpenRouter(selectedModel, messages, system_prompt);
     }
     // Call Ollama
@@ -129,6 +138,48 @@ async function callOpenRouter(model, messages, system_prompt) {
 }
 
 /**
+ * Call OpenAI API
+ */
+async function callOpenAI(model, messages, system_prompt) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY not configured');
+  }
+
+  try {
+    const modelName = model.replace('openai/', '');
+    
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: modelName,
+        messages: system_prompt ? [
+          { role: 'system', content: system_prompt },
+          ...messages
+        ] : messages,
+        temperature: 0.7,
+        max_tokens: 2000
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return {
+      content: response.data.choices[0].message.content,
+      model: model,
+      tokens: response.data.usage?.total_tokens || 0
+    };
+  } catch (error) {
+    console.error('OpenAI API error:', error.response?.data || error.message);
+    throw new Error(`OpenAI error: ${error.message}`);
+  }
+}
+
+/**
  * Call Ollama (local LLM)
  */
 async function callOllama(messages, system_prompt = '') {
@@ -163,6 +214,7 @@ async function callOllama(messages, system_prompt = '') {
 module.exports = {
   chat,
   selectModel,
+  callOpenAI,
   callOpenRouter,
   callOllama
 };
