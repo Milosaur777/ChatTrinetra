@@ -87,7 +87,7 @@ async function chat({ system_prompt, message, file_context, message_history, mod
       return await callOpenRouter(selectedModel, messages, system_prompt);
     }
     // Call Ollama
-    else if (selectedModel === modelConfig.ollama) {
+    else if (selectedModel === 'ollama' || selectedModel.includes('localhost:11434')) {
       return await callOllama(messages, system_prompt);
     }
   } catch (error) {
