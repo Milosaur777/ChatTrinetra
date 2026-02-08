@@ -79,7 +79,7 @@ async function chat({ system_prompt, message, file_context, message_history, mod
     }
     // Call Ollama
     else if (selectedModel === modelConfig.ollama) {
-      return await callOllama(messages);
+      return await callOllama(messages, system_prompt);
     }
   } catch (error) {
     console.error('LLM Service error:', error);
