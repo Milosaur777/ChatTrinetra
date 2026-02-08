@@ -75,9 +75,9 @@ async function chat({ system_prompt, message, file_context, message_history, mod
     else if (selectedModel.includes('openai/')) {
       return await callOpenAI(selectedModel, messages, system_prompt);
     }
-    // Call OpenRouter
+    // OpenRouter disabled - use Claude API instead!
     else if (selectedModel.includes('openrouter')) {
-      return await callOpenRouter(selectedModel, messages, system_prompt);
+      throw new Error('OpenRouter has been disabled. Use Claude or OLLAMA instead.');
     }
     // Call Ollama
     else if (selectedModel === 'ollama' || selectedModel.includes('localhost:11434')) {
