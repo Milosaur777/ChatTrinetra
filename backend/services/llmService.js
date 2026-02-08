@@ -28,7 +28,7 @@ function selectModel(userModel = null, complexity = 'simple') {
   if (userModel) return userModel;
 
   // Default to Claude for Clawdbot (OpenClaw) - using Claude API key
-  return 'claude-3-5-sonnet-20241022';
+  return 'claude-sonnet-4-5-20250929';
 }
 
 /**
