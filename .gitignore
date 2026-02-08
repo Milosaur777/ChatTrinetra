@@ -61,3 +61,4 @@ temp/
 # Node
 .node-gyp/
 .cache/
+backend/.env

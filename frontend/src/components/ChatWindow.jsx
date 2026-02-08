@@ -48,11 +48,6 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
       description: '$0.25/M tokens'
     },
     { 
-      value: 'openrouter/google/gemini-flash-1.5', 
-      label: 'Gemini Flash (Fast)',
-      description: '$0.15/M tokens'
-    },
-    { 
       value: 'openrouter/anthropic/claude-sonnet-4.5', 
       label: 'Sonnet (Smart)',
       description: '$3/M tokens'
@@ -182,10 +177,11 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
       }])
     } catch (error) {
       console.error('Failed to send message:', error)
+      const errorMsg = error.response?.data?.error || error.message || 'Unknown error occurred'
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'assistant',
-        content: 'Failed to send message. Make sure backend is running on port 3001.',
+        content: `Error: ${errorMsg}`,
         created_at: new Date().toISOString()
       }])
     } finally {

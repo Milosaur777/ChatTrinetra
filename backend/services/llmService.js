@@ -174,8 +174,17 @@ async function callOpenAI(model, messages, system_prompt) {
       tokens: response.data.usage?.total_tokens || 0
     };
   } catch (error) {
-    console.error('OpenAI API error:', error.response?.data || error.message);
-    throw new Error(`OpenAI error: ${error.message}`);
+    const errorMsg = error.response?.data?.error?.message || error.message;
+    console.error('OpenAI API error:', errorMsg);
+    
+    // Handle specific OpenAI errors
+    if (error.response?.status === 429) {
+      throw new Error('OpenAI rate limit exceeded. Please wait a moment and try again.');
+    } else if (error.response?.status === 401) {
+      throw new Error('OpenAI API key is invalid. Please check your configuration.');
+    }
+    
+    throw new Error(`OpenAI error: ${errorMsg}`);
   }
 }
 
@@ -207,7 +216,12 @@ async function callOllama(messages, system_prompt = '') {
     };
   } catch (error) {
     console.error('Ollama error:', error.message);
-    throw new Error(`Ollama not running on localhost:11434. Install Ollama and run: ollama serve`);
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error('Ollama is not running. Make sure OLLAMA is started on port 11434.');
+    } else if (error.message.includes('404')) {
+      throw new Error('Ollama model not found. Make sure mistral:latest is loaded.');
+    }
+    throw new Error(`Ollama error: ${error.message}`);
   }
 }
 
