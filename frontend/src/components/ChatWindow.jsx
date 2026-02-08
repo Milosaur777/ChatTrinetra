@@ -7,7 +7,7 @@ export default function ChatWindow({ conversation, files, onConversationUpdate }
   const [messages, setMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const [selectedModel, setSelectedModel] = useState('openrouter/anthropic/claude-haiku-4.5')
+  const [selectedModel, setSelectedModel] = useState('ollama')
   const [selectedFiles, setSelectedFiles] = useState([])
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [editedTitle, setEditedTitle] = useState(conversation?.title || '')
