@@ -27,19 +27,8 @@ const modelConfig = {
 function selectModel(userModel = null, complexity = 'simple') {
   if (userModel) return userModel;
 
-  // Auto-routing based on complexity
-  switch (complexity) {
-    case 'simple':
-      return modelConfig.haiku;
-    case 'coding':
-      return modelConfig.kimi;
-    case 'frontend':
-      return modelConfig.gemini;
-    case 'hard':
-      return modelConfig.sonnet;
-    default:
-      return modelConfig.haiku;
-  }
+  // Default to Claude for Clawdbot (OpenClaw) - using Claude API key
+  return 'claude-3-5-sonnet-20241022';
 }
 
 /**
@@ -78,8 +67,12 @@ async function chat({ system_prompt, message, file_context, message_history, mod
       content: context + message
     });
 
+    // Call Claude directly (via Anthropic API)
+    if (selectedModel.includes('claude')) {
+      return await callClaude(selectedModel, messages, system_prompt);
+    }
     // Call OpenAI
-    if (selectedModel.includes('openai/')) {
+    else if (selectedModel.includes('openai/')) {
       return await callOpenAI(selectedModel, messages, system_prompt);
     }
     // Call OpenRouter
@@ -134,6 +127,52 @@ async function callOpenRouter(model, messages, system_prompt) {
   } catch (error) {
     console.error('OpenRouter API error:', error.response?.data || error.message);
     throw new Error(`OpenRouter error: ${error.message}`);
+  }
+}
+
+/**
+ * Call Claude API (Anthropic)
+ */
+async function callClaude(model, messages, system_prompt) {
+  const apiKey = process.env.CLAUDE_API_KEY;
+  if (!apiKey) {
+    throw new Error('CLAUDE_API_KEY not configured');
+  }
+
+  try {
+    const response = await axios.post(
+      'https://api.anthropic.com/v1/messages',
+      {
+        model: model,
+        max_tokens: 2048,
+        system: system_prompt || 'You are a helpful AI assistant.',
+        messages: messages
+      },
+      {
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    return {
+      content: response.data.content[0].text,
+      model: model,
+      tokens: response.data.usage?.input_tokens + response.data.usage?.output_tokens || 0
+    };
+  } catch (error) {
+    const errorMsg = error.response?.data?.error?.message || error.message;
+    console.error('Claude API error:', errorMsg);
+    
+    if (error.response?.status === 401) {
+      throw new Error('Claude API key is invalid. Please check your configuration.');
+    } else if (error.response?.status === 429) {
+      throw new Error('Claude rate limit exceeded. Please wait a moment and try again.');
+    }
+    
+    throw new Error(`Claude error: ${errorMsg}`);
   }
 }
 
@@ -228,6 +267,7 @@ async function callOllama(messages, system_prompt = '') {
 module.exports = {
   chat,
   selectModel,
+  callClaude,
   callOpenAI,
   callOpenRouter,
   callOllama
